@@ -16,16 +16,16 @@ const OPTIONS: { value: CalendarView; label: string }[] = [
 
 export function ViewSwitcher({ view, onChange }: ViewSwitcherProps) {
   return (
-    <div className="inline-flex rounded-lg border bg-muted/50 p-0.5">
+    <div className="inline-flex shrink-0 rounded-lg border border-primary/10 bg-muted/60 p-0.5">
       {OPTIONS.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
           className={cn(
-            "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+            "rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 sm:px-3",
             view === opt.value
-              ? "bg-card text-foreground shadow-sm"
+              ? "bg-card text-primary shadow-sm"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
