@@ -12,7 +12,6 @@ import {
   addDaysToJalali,
 } from "@/lib/jalali"
 import { useTasks, type Task, type Priority, type Tag } from "@/lib/tasks"
-import { cn } from "@/lib/utils"
 import { CalendarHeader } from "@/components/calendar-header"
 import { MonthlyCalendar } from "@/components/monthly-calendar"
 import { WeeklyCalendar } from "@/components/weekly-calendar"
@@ -40,7 +39,6 @@ export function CalendarApp() {
   const todayJ = todayJalali()
 
   const [page, setPage] = useState<AppPage>("calendar")
-  const [pageDirection, setPageDirection] = useState<"left" | "right">("left")
   const [view, setView] = useState<CalendarView>("month")
   const [anchor, setAnchor] = useState({ jy: todayJ.jy, jm: todayJ.jm })
   const [weekAnchor, setWeekAnchor] = useState(today)
@@ -136,7 +134,6 @@ export function CalendarApp() {
 
   function changePage(nextPage: AppPage) {
     if (nextPage === page) return
-    setPageDirection(nextPage === "tasks" ? "left" : "right")
     setPage(nextPage)
   }
 
@@ -163,17 +160,6 @@ export function CalendarApp() {
       y: touch.clientY,
       nearLeftEdge: touch.clientX <= EDGE_SIZE,
       nearRightEdge: touch.clientX >= window.innerWidth - EDGE_SIZE,
-    }
-  }
-
-  function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
-    const start = swipeStart.current
-    if (!start) return
-    const touch = event.touches[0]
-    const deltaX = touch.clientX - start.x
-    const deltaY = touch.clientY - start.y
-    if (Math.abs(deltaX) > 12 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
-      event.preventDefault()
     }
   }
 
@@ -210,19 +196,9 @@ export function CalendarApp() {
     <div
       className="mx-auto flex w-full max-w-6xl touch-pan-y flex-col gap-4 px-2 py-4 pb-28 sm:gap-5 sm:px-6 sm:py-10 sm:pb-32"
       onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div
-        key={page}
-        className={cn(
-          "flex flex-col gap-4 sm:gap-5",
-          "animate-in fade-in-0 duration-200 motion-reduce:animate-none",
-          pageDirection === "left"
-            ? "slide-in-from-left-2"
-            : "slide-in-from-right-2",
-        )}
-      >
+      <div className="flex flex-col gap-4 sm:gap-5">
         {page === "calendar" ? (
           <>
             <CalendarHeader

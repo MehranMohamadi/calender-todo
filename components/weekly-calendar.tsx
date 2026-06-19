@@ -38,7 +38,7 @@ export function WeeklyCalendar({
   const days = getWeekDays(anchorIso)
 
   return (
-    <div className="flex min-h-[calc(100vh-180px)] animate-in flex-col gap-2.5 fade-in-0 slide-in-from-bottom-1 duration-200 ease-out motion-reduce:animate-none">
+    <div className="flex min-h-[calc(100vh-180px)] flex-col gap-2.5">
       {days.map((day, index) => {
         const tasks = tasksByDate.get(day.iso) ?? []
         const isToday = day.iso === todayIso
@@ -61,7 +61,7 @@ export function WeeklyCalendar({
               }
             }}
             className={cn(
-              "group flex flex-1 cursor-pointer flex-col gap-2 rounded-xl border bg-card p-3 text-right transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.995] motion-reduce:transform-none motion-reduce:transition-none sm:flex-row sm:items-stretch sm:gap-4",
+              "group flex flex-1 cursor-pointer flex-col gap-2 rounded-xl border bg-card p-3 text-right transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none sm:flex-row sm:items-stretch sm:gap-4",
               isToday && "border-primary/40 bg-primary/5",
               isHoliday && !isToday && "border-destructive/30 bg-destructive/5",
               isSelected &&

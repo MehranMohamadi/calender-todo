@@ -19,7 +19,7 @@ export function AppBottomNav({ page, onChange }: AppBottomNavProps) {
   return (
     <nav
       aria-label="ناوبری اصلی"
-      className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 z-40 flex w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-primary/15 bg-card/90 p-1.5 shadow-xl shadow-primary/10 backdrop-blur-xl"
+      className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 mx-auto flex max-w-sm isolate rounded-2xl border border-primary/15 bg-card p-1.5 shadow-lg"
     >
       {ITEMS.map((item) => {
         const Icon = item.icon
@@ -31,7 +31,7 @@ export function AppBottomNav({ page, onChange }: AppBottomNavProps) {
             onClick={() => onChange(item.value)}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-medium transition-all duration-200 motion-reduce:transition-none",
+              "flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-medium transition-colors duration-150 motion-reduce:transition-none",
               active
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",

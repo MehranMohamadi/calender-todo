@@ -59,7 +59,7 @@ export function TasksPage({
   }, [filter, search, tasks])
 
   return (
-    <section className="flex animate-in flex-col gap-4 fade-in-0 slide-in-from-left-2 duration-200 motion-reduce:animate-none">
+    <section className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-foreground">همهٔ کارها</h2>
@@ -98,7 +98,7 @@ export function TasksPage({
             <article
               key={task.id}
               className={cn(
-                "group flex min-w-0 flex-col gap-3 rounded-2xl border bg-card/85 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none",
+                "group flex min-w-0 flex-col gap-3 rounded-2xl border bg-card/85 p-4 shadow-sm transition-shadow duration-150 hover:shadow-md motion-reduce:transition-none",
                 task.completed && "bg-muted/55",
               )}
             >

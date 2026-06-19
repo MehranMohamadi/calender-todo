@@ -30,7 +30,7 @@ export function MonthlyCalendar({
   const days = getMonthGrid(jy, jm)
 
   return (
-    <div className="flex min-w-0 animate-in flex-col gap-1.5 fade-in-0 slide-in-from-bottom-1 duration-200 ease-out motion-reduce:animate-none sm:gap-2">
+    <div className="flex min-w-0 flex-col gap-1.5 sm:gap-2">
       <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {PERSIAN_WEEKDAYS.map((wd) => (
           <div

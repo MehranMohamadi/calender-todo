@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { todayISO, addDaysToJalali, todayJalali } from "@/lib/jalali"
 
 export type Priority = "low" | "medium" | "high"
 
@@ -65,75 +64,18 @@ export function createTagId(): string {
 }
 
 const STORAGE_KEY = "jalali-calendar-tasks-v1"
+const SAMPLE_CLEANUP_KEY = "jalali-calendar-samples-cleaned-v1"
+const LEGACY_SAMPLE_TITLES = new Set([
+  "جلسه با تیم طراحی",
+  "پرداخت قبض‌ها",
+  "مطالعه مستندات پروژه",
+  "خرید خانه",
+  "تمرین ورزشی",
+  "تماس با مشتری",
+])
 
 function createId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
-}
-
-function buildSampleTasks(): Task[] {
-  const j = todayJalali()
-  const offset = (delta: number) =>
-    addDaysToJalali(j.jy, j.jm, j.jd, delta).iso
-
-  const tag = (label: string, color: string): Tag => ({
-    id: createTagId(),
-    label,
-    color,
-  })
-
-  return [
-    {
-      id: createId(),
-      title: "جلسه با تیم طراحی",
-      description: "بررسی نسخه جدید رابط کاربری و جمع‌بندی بازخوردها",
-      date: offset(0),
-      completed: false,
-      priority: "high",
-      tags: [tag("کاری", "#2563eb"), tag("فوری", "#dc2626")],
-    },
-    {
-      id: createId(),
-      title: "پرداخت قبض‌ها",
-      description: "قبض برق و اینترنت",
-      date: offset(0),
-      completed: true,
-      priority: "medium",
-      tags: [tag("مالی", "#16a34a")],
-    },
-    {
-      id: createId(),
-      title: "مطالعه مستندات پروژه",
-      date: offset(1),
-      completed: false,
-      priority: "low",
-      tags: [tag("کاری", "#2563eb")],
-    },
-    {
-      id: createId(),
-      title: "خرید خانه",
-      description: "میوه، نان و مواد شوینده",
-      date: offset(2),
-      completed: false,
-      priority: "medium",
-      tags: [tag("خانه", "#d97706")],
-    },
-    {
-      id: createId(),
-      title: "تمرین ورزشی",
-      date: offset(-1),
-      completed: true,
-      priority: "low",
-      tags: [tag("سلامت", "#db2777")],
-    },
-    {
-      id: createId(),
-      title: "تماس با مشتری",
-      date: offset(3),
-      completed: false,
-      priority: "high",
-      tags: [tag("کاری", "#2563eb"), tag("شخصی", "#0d9488")],
-    },
-  ]
 }
 
 export function useTasks() {
@@ -145,17 +87,25 @@ export function useTasks() {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
         const parsed = JSON.parse(raw) as Task[]
-        // Backward compatibility: ensure every task has a tags array.
-        setTasks(
-          parsed.map((t) => ({ ...t, tags: Array.isArray(t.tags) ? t.tags : [] })),
-        )
+        const shouldCleanSamples = !localStorage.getItem(SAMPLE_CLEANUP_KEY)
+        const cleaned = shouldCleanSamples
+          ? parsed.filter((task) => !LEGACY_SAMPLE_TITLES.has(task.title))
+          : parsed
+        const normalized = cleaned.map((task) => ({
+          ...task,
+          tags: Array.isArray(task.tags) ? task.tags : [],
+        }))
+        setTasks(normalized)
+        if (shouldCleanSamples) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized))
+          localStorage.setItem(SAMPLE_CLEANUP_KEY, "1")
+        }
       } else {
-        const sample = buildSampleTasks()
-        setTasks(sample)
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(sample))
+        setTasks([])
+        localStorage.setItem(SAMPLE_CLEANUP_KEY, "1")
       }
     } catch {
-      setTasks(buildSampleTasks())
+      setTasks([])
     }
     setLoaded(true)
   }, [])
@@ -194,5 +144,3 @@ export function useTasks() {
 
   return { tasks, loaded, addTask, updateTask, deleteTask, toggleTask }
 }
-
-export { todayISO }
