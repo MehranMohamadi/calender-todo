@@ -12,7 +12,6 @@ const vazirmatn = Vazirmatn({
 export const metadata: Metadata = {
   title: 'تقویم کارهای من',
   description: 'تقویم جلالی فارسی همراه با مدیریت کارها',
-  generator: 'v0.app',
   applicationName: 'تقویم کارهای من',
   manifest: '/manifest.webmanifest',
   icons: {

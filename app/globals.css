@@ -173,3 +173,8 @@
     @apply font-sans;
   }
 }
+
+/* The v0 preview environment injects this badge outside the app tree. */
+[id^='v0-built-with-button-'] {
+  display: none !important;
+}
