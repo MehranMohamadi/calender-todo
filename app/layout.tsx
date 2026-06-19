@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Vazirmatn } from 'next/font/google'
+import { PwaInstaller } from '@/components/pwa-installer'
 import './globals.css'
 
 const vazirmatn = Vazirmatn({
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
   title: 'تقویم کارهای من',
   description: 'تقویم جلالی فارسی همراه با مدیریت کارها',
   generator: 'v0.app',
+  applicationName: 'تقویم کارهای من',
+  manifest: '/manifest.webmanifest',
   icons: {
     icon: [
       {
@@ -27,13 +30,13 @@ export const metadata: Metadata = {
         type: 'image/svg+xml',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: '/pwa-icon.svg',
   },
 }
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#f6f4ef',
+  themeColor: '#2563a6',
 }
 
 export default function RootLayout({
@@ -49,6 +52,7 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         {children}
+        <PwaInstaller />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
