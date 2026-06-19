@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,16 @@ import {
   readableTextColor,
   createTagId,
 } from "@/lib/tasks"
-import { formatFullDate } from "@/lib/jalali"
+import {
+  PERSIAN_MONTHS,
+  formatFullDate,
+  getJalaliMonthLength,
+  isoToJalali,
+  jalaliToISO,
+  toPersianDigits,
+  todayISO,
+  todayJalali,
+} from "@/lib/jalali"
 
 export interface TaskDialogState {
   open: boolean
@@ -44,6 +53,7 @@ interface TaskDialogProps {
     description?: string
     priority: Priority
     tags: Tag[]
+    date: string
   }) => void
   onDelete?: () => void
 }
@@ -62,6 +72,7 @@ export function TaskDialog({
   const [tagLabel, setTagLabel] = useState("")
   const [tagColor, setTagColor] = useState("#2563eb")
   const [error, setError] = useState("")
+  const [taskDate, setTaskDate] = useState(() => isoToJalali(todayISO()))
 
   useEffect(() => {
     if (state.open) {
@@ -72,10 +83,24 @@ export function TaskDialog({
       setTagLabel("")
       setTagColor("#2563eb")
       setError("")
+      setTaskDate(isoToJalali(state.task?.date ?? state.date ?? todayISO()))
     }
   }, [state.open, state.task])
 
-  const dateLabel = state.task?.date ?? state.date
+  const maxDay = getJalaliMonthLength(taskDate.jy, taskDate.jm)
+  const selectedDate = jalaliToISO(
+    taskDate.jy,
+    taskDate.jm,
+    Math.min(taskDate.jd, maxDay),
+  )
+  const currentJalaliYear = todayJalali().jy
+  const years = useMemo(() => {
+    const values = Array.from({ length: 31 }, (_, index) =>
+      currentJalaliYear - 10 + index,
+    )
+    if (!values.includes(taskDate.jy)) values.push(taskDate.jy)
+    return values.sort((a, b) => a - b)
+  }, [currentJalaliYear, taskDate.jy])
 
   function addTag(label: string, color: string) {
     const trimmed = label.trim()
@@ -103,22 +128,98 @@ export function TaskDialog({
       description: description.trim() || undefined,
       priority,
       tags,
+      date: selectedDate,
     })
   }
 
   return (
     <Dialog open={state.open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md" dir="rtl" initialFocus={false}>
+      <DialogContent
+        className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md"
+        dir="rtl"
+        initialFocus={false}
+      >
         <DialogHeader className="text-right">
           <DialogTitle>{isEdit ? "ویرایش کار" : "افزودن کار"}</DialogTitle>
-          {dateLabel && (
-            <DialogDescription className="text-right">
-              {formatFullDate(dateLabel)}
-            </DialogDescription>
-          )}
+          <DialogDescription className="text-right">
+            {formatFullDate(selectedDate)}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
+          <div className="flex flex-col gap-2">
+            <Label>تاریخ</Label>
+            <div className="grid grid-cols-3 gap-2">
+              <Select
+                value={String(taskDate.jd)}
+                onValueChange={(value) =>
+                  setTaskDate((date) => ({ ...date, jd: Number(value) }))
+                }
+              >
+                <SelectTrigger className="w-full" aria-label="روز">
+                  <SelectValue>{toPersianDigits(Math.min(taskDate.jd, maxDay))}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: maxDay }, (_, index) => index + 1).map((day) => (
+                    <SelectItem key={day} value={String(day)}>
+                      {toPersianDigits(day)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={String(taskDate.jm)}
+                onValueChange={(value) =>
+                  setTaskDate((date) => {
+                    const jm = Number(value)
+                    return {
+                      ...date,
+                      jm,
+                      jd: Math.min(date.jd, getJalaliMonthLength(date.jy, jm)),
+                    }
+                  })
+                }
+              >
+                <SelectTrigger className="w-full" aria-label="ماه">
+                  <SelectValue>{PERSIAN_MONTHS[taskDate.jm - 1]}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {PERSIAN_MONTHS.map((month, index) => (
+                    <SelectItem key={month} value={String(index + 1)}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={String(taskDate.jy)}
+                onValueChange={(value) =>
+                  setTaskDate((date) => {
+                    const jy = Number(value)
+                    return {
+                      ...date,
+                      jy,
+                      jd: Math.min(date.jd, getJalaliMonthLength(jy, date.jm)),
+                    }
+                  })
+                }
+              >
+                <SelectTrigger className="w-full" aria-label="سال">
+                  <SelectValue>{toPersianDigits(taskDate.jy)}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={String(year)}>
+                      {toPersianDigits(year)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="task-title">عنوان کار</Label>
             <Input

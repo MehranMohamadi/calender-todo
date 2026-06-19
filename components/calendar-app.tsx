@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState, type TouchEvent } from "react"
 import {
   todayISO,
   todayJalali,
@@ -12,12 +12,25 @@ import {
   addDaysToJalali,
 } from "@/lib/jalali"
 import { useTasks, type Task, type Priority, type Tag } from "@/lib/tasks"
+import { cn } from "@/lib/utils"
 import { CalendarHeader } from "@/components/calendar-header"
 import { MonthlyCalendar } from "@/components/monthly-calendar"
 import { WeeklyCalendar } from "@/components/weekly-calendar"
-import { TaskFilters, type TaskFilter } from "@/components/task-filters"
+import { TasksPage } from "@/components/tasks-page"
 import { TaskDialog, type TaskDialogState } from "@/components/task-dialog"
+import { AppBottomNav, type AppPage } from "@/components/app-bottom-nav"
+import type { TaskFilter } from "@/components/task-filters"
 import type { CalendarView } from "@/components/view-switcher"
+
+interface SwipeStart {
+  x: number
+  y: number
+  nearLeftEdge: boolean
+  nearRightEdge: boolean
+}
+
+const SWIPE_THRESHOLD = 56
+const EDGE_SIZE = 32
 
 export function CalendarApp() {
   const { tasks, loaded, addTask, updateTask, deleteTask, toggleTask } =
@@ -26,15 +39,15 @@ export function CalendarApp() {
   const today = todayISO()
   const todayJ = todayJalali()
 
+  const [page, setPage] = useState<AppPage>("calendar")
+  const [pageDirection, setPageDirection] = useState<"left" | "right">("left")
   const [view, setView] = useState<CalendarView>("month")
-  // Month view anchor (Jalali year + month)
   const [anchor, setAnchor] = useState({ jy: todayJ.jy, jm: todayJ.jm })
-  // Week view anchor (any ISO date within the week)
   const [weekAnchor, setWeekAnchor] = useState(today)
   const [selectedIso, setSelectedIso] = useState<string | null>(today)
-
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<TaskFilter>("all")
+  const swipeStart = useRef<SwipeStart | null>(null)
 
   const [dialog, setDialog] = useState<TaskDialogState>({
     open: false,
@@ -42,26 +55,16 @@ export function CalendarApp() {
     task: null,
   })
 
-  // Filtered tasks grouped by date for fast cell lookup.
   const tasksByDate = useMemo(() => {
-    const q = search.trim().toLowerCase()
     const map = new Map<string, Task[]>()
+    const weight: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+
     for (const task of tasks) {
-      if (filter === "done" && !task.completed) continue
-      if (filter === "todo" && task.completed) continue
-      if (
-        q &&
-        !task.title.toLowerCase().includes(q) &&
-        !(task.description?.toLowerCase().includes(q) ?? false)
-      ) {
-        continue
-      }
       const list = map.get(task.date) ?? []
       list.push(task)
       map.set(task.date, list)
     }
-    // Stable order: incomplete first, then by priority weight.
-    const weight: Record<Priority, number> = { high: 0, medium: 1, low: 2 }
+
     for (const list of map.values()) {
       list.sort((a, b) => {
         if (a.completed !== b.completed) return a.completed ? 1 : -1
@@ -69,7 +72,7 @@ export function CalendarApp() {
       })
     }
     return map
-  }, [tasks, search, filter])
+  }, [tasks])
 
   const title =
     view === "month"
@@ -78,19 +81,19 @@ export function CalendarApp() {
 
   function handlePrev() {
     if (view === "month") {
-      setAnchor((a) => jalaaliMonthShift(a.jy, a.jm, -1))
+      setAnchor((value) => jalaaliMonthShift(value.jy, value.jm, -1))
     } else {
-      const j = isoToJalali(weekAnchor)
-      setWeekAnchor(addDaysToJalali(j.jy, j.jm, j.jd, -7).iso)
+      const jalali = isoToJalali(weekAnchor)
+      setWeekAnchor(addDaysToJalali(jalali.jy, jalali.jm, jalali.jd, -7).iso)
     }
   }
 
   function handleNext() {
     if (view === "month") {
-      setAnchor((a) => jalaaliMonthShift(a.jy, a.jm, 1))
+      setAnchor((value) => jalaaliMonthShift(value.jy, value.jm, 1))
     } else {
-      const j = isoToJalali(weekAnchor)
-      setWeekAnchor(addDaysToJalali(j.jy, j.jm, j.jd, 7).iso)
+      const jalali = isoToJalali(weekAnchor)
+      setWeekAnchor(addDaysToJalali(jalali.jy, jalali.jm, jalali.jd, 7).iso)
     }
   }
 
@@ -115,12 +118,14 @@ export function CalendarApp() {
     description?: string
     priority: Priority
     tags: Tag[]
+    date: string
   }) {
     if (dialog.task) {
       updateTask(dialog.task.id, data)
-    } else if (dialog.date) {
-      addTask({ ...data, date: dialog.date })
+    } else {
+      addTask(data)
     }
+    setSelectedIso(data.date)
     setDialog({ open: false, date: null, task: null })
   }
 
@@ -129,62 +134,159 @@ export function CalendarApp() {
     setDialog({ open: false, date: null, task: null })
   }
 
+  function changePage(nextPage: AppPage) {
+    if (nextPage === page) return
+    setPageDirection(nextPage === "tasks" ? "left" : "right")
+    setPage(nextPage)
+  }
+
+  function shouldIgnoreSwipe(target: EventTarget | null) {
+    return (
+      target instanceof Element &&
+      Boolean(
+        target.closest(
+          "button, input, textarea, select, a, [role='dialog'], [data-swipe-ignore]",
+        ),
+      )
+    )
+  }
+
+  function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
+    if (dialog.open || shouldIgnoreSwipe(event.target)) {
+      swipeStart.current = null
+      return
+    }
+
+    const touch = event.touches[0]
+    swipeStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      nearLeftEdge: touch.clientX <= EDGE_SIZE,
+      nearRightEdge: touch.clientX >= window.innerWidth - EDGE_SIZE,
+    }
+  }
+
+  function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
+    const start = swipeStart.current
+    if (!start) return
+    const touch = event.touches[0]
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    if (Math.abs(deltaX) > 12 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+      event.preventDefault()
+    }
+  }
+
+  function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    const start = swipeStart.current
+    swipeStart.current = null
+    if (!start) return
+
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - start.x
+    const deltaY = touch.clientY - start.y
+    const horizontal =
+      Math.abs(deltaX) >= SWIPE_THRESHOLD &&
+      Math.abs(deltaX) > Math.abs(deltaY) * 1.25
+
+    if (!horizontal) return
+
+    if (page === "calendar" && start.nearRightEdge && deltaX < 0) {
+      changePage("tasks")
+      return
+    }
+    if (page === "tasks" && start.nearLeftEdge && deltaX > 0) {
+      changePage("calendar")
+      return
+    }
+
+    if (page === "calendar") {
+      if (deltaX < 0) handleNext()
+      else handlePrev()
+    }
+  }
+
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-2 py-4 sm:gap-5 sm:px-6 sm:py-10">
-      <CalendarHeader
-        title={title}
-        view={view}
-        onViewChange={setView}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        onToday={handleToday}
-      />
+    <div
+      className="mx-auto flex w-full max-w-6xl touch-pan-y flex-col gap-4 px-2 py-4 pb-28 sm:gap-5 sm:px-6 sm:py-10 sm:pb-32"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div
+        key={page}
+        className={cn(
+          "flex flex-col gap-4 sm:gap-5",
+          "animate-in fade-in-0 duration-200 motion-reduce:animate-none",
+          pageDirection === "left"
+            ? "slide-in-from-left-2"
+            : "slide-in-from-right-2",
+        )}
+      >
+        {page === "calendar" ? (
+          <>
+            <CalendarHeader
+              title={title}
+              view={view}
+              onViewChange={setView}
+              onPrev={handlePrev}
+              onNext={handleNext}
+              onToday={handleToday}
+            />
 
-      <TaskFilters
-        search={search}
-        onSearchChange={setSearch}
-        filter={filter}
-        onFilterChange={setFilter}
-      />
-
-      <main className="min-w-0 rounded-xl border bg-card/40 p-1.5 shadow-sm sm:rounded-2xl sm:p-4">
-        {!loaded ? (
-          <div className="py-20 text-center text-muted-foreground">
-            در حال بارگذاری...
-          </div>
-        ) : view === "month" ? (
-          <MonthlyCalendar
-            key={`month-${anchor.jy}-${anchor.jm}`}
-            jy={anchor.jy}
-            jm={anchor.jm}
-            todayIso={today}
-            selectedIso={selectedIso}
-            tasksByDate={tasksByDate}
-            onSelectDay={openAdd}
-            onAddTask={openAdd}
-            onEditTask={openEdit}
-            onToggleTask={toggleTask}
-          />
+            <main className="min-w-0 rounded-xl border bg-card/40 p-1.5 shadow-sm sm:rounded-2xl sm:p-4">
+              {!loaded ? (
+                <div className="py-20 text-center text-muted-foreground">
+                  در حال بارگذاری...
+                </div>
+              ) : view === "month" ? (
+                <MonthlyCalendar
+                  key={`month-${anchor.jy}-${anchor.jm}`}
+                  jy={anchor.jy}
+                  jm={anchor.jm}
+                  todayIso={today}
+                  selectedIso={selectedIso}
+                  tasksByDate={tasksByDate}
+                  onSelectDay={openAdd}
+                  onAddTask={openAdd}
+                  onEditTask={openEdit}
+                  onToggleTask={toggleTask}
+                />
+              ) : (
+                <WeeklyCalendar
+                  key={`week-${weekAnchor}`}
+                  anchorIso={weekAnchor}
+                  todayIso={today}
+                  selectedIso={selectedIso}
+                  tasksByDate={tasksByDate}
+                  onSelectDay={openAdd}
+                  onAddTask={openAdd}
+                  onEditTask={openEdit}
+                  onToggleTask={toggleTask}
+                />
+              )}
+            </main>
+          </>
         ) : (
-          <WeeklyCalendar
-            key={`week-${weekAnchor}`}
-            anchorIso={weekAnchor}
-            todayIso={today}
-            selectedIso={selectedIso}
-            tasksByDate={tasksByDate}
-            onSelectDay={openAdd}
-            onAddTask={openAdd}
-            onEditTask={openEdit}
-            onToggleTask={toggleTask}
+          <TasksPage
+            tasks={tasks}
+            loaded={loaded}
+            search={search}
+            filter={filter}
+            onSearchChange={setSearch}
+            onFilterChange={setFilter}
+            onAdd={() => openAdd(today)}
+            onEdit={openEdit}
+            onToggle={toggleTask}
           />
         )}
-      </main>
+      </div>
+
+      <AppBottomNav page={page} onChange={changePage} />
 
       <TaskDialog
         state={dialog}
-        onOpenChange={(open) =>
-          setDialog((d) => ({ ...d, open }))
-        }
+        onOpenChange={(open) => setDialog((value) => ({ ...value, open }))}
         onSave={handleSave}
         onDelete={handleDelete}
       />

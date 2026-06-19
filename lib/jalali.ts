@@ -69,6 +69,11 @@ export function jalaliToISO(jy: number, jm: number, jd: number): string {
   return gregorianToISO(gy, gm, gd)
 }
 
+/** Number of days in a Jalali month, accounting for leap years. */
+export function getJalaliMonthLength(jy: number, jm: number): number {
+  return jalaaliMonthLength(jy, jm)
+}
+
 /** Today's date as a date-only ISO string (local). */
 export function todayISO(): string {
   const now = new Date()

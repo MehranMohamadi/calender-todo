@@ -1,6 +1,8 @@
 "use client"
 
+import { Search } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Input } from "@/components/ui/input"
 
 export type TaskFilter = "all" | "done" | "todo"
 
@@ -24,7 +26,18 @@ export function TaskFilters({
   onFilterChange,
 }: TaskFiltersProps) {
   return (
-    <div className="flex items-center">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative w-full sm:max-w-xs">
+        <Search className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder="جستجو در کارها..."
+          aria-label="جستجو در کارها"
+          className="bg-card/70 pr-8"
+        />
+      </div>
+
       <div className="inline-flex rounded-lg border border-primary/10 bg-card/70 p-0.5 shadow-xs backdrop-blur-sm">
         {FILTERS.map((f) => (
           <button
