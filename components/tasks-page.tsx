@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { CalendarDays, Check, ClipboardList, Pencil, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TaskFilters, type TaskFilter } from "@/components/task-filters"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
 import { formatFullDate } from "@/lib/jalali"
 import {
@@ -67,10 +68,13 @@ export function TasksPage({
             مدیریت کارها فارغ از نمای تقویم
           </p>
         </div>
-        <Button onClick={onAdd} className="gap-1.5">
-          <Plus className="size-4" />
-          افزودن کار
-        </Button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <Button onClick={onAdd} className="gap-1.5">
+            <Plus className="size-4" />
+            افزودن کار
+          </Button>
+        </div>
       </header>
 
       <TaskFilters

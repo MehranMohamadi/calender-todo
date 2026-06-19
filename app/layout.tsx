@@ -34,8 +34,11 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#0f766e',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#0f766e' },
+    { media: '(prefers-color-scheme: dark)', color: '#111827' },
+  ],
 }
 
 export default function RootLayout({
@@ -47,8 +50,16 @@ export default function RootLayout({
     <html
       lang="fa"
       dir="rtl"
-      className={`light ${vazirmatn.variable} bg-background`}
+      className={`${vazirmatn.variable} bg-background`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('jalali-calendar-theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.add(d?'dark':'light')}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         {children}
         <PwaInstaller />

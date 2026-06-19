@@ -3,6 +3,7 @@
 import { CalendarDays, ChevronRight, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ViewSwitcher, type CalendarView } from "@/components/view-switcher"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface CalendarHeaderProps {
   title: string
@@ -32,7 +33,10 @@ export function CalendarHeader({
             تقویم کارهای من
           </h1>
         </div>
-        <ViewSwitcher view={view} onChange={onViewChange} />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <ViewSwitcher view={view} onChange={onViewChange} />
+        </div>
       </div>
 
       <div className="relative z-10 flex items-center justify-between gap-3 border-t border-primary/10 pt-3">
