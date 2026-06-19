@@ -27,15 +27,7 @@ export function TaskFilters({
 }: TaskFiltersProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="relative w-full sm:max-w-xs">
-        <Search className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="جستجوی کارها..."
-          className="pe-9"
-        />
-      </div>
+    
 
       <div className="inline-flex rounded-lg border bg-muted/50 p-0.5">
         {FILTERS.map((f) => (

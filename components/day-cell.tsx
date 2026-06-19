@@ -50,7 +50,7 @@ export function DayCell({
         }
       }}
       className={cn(
-        "group relative flex min-h-16 min-w-0 cursor-pointer flex-col gap-0.5 rounded-lg border bg-card p-1 text-right transition-all hover:shadow-sm sm:min-h-32 sm:gap-1 sm:rounded-xl sm:p-2",
+        "group relative flex min-h-16 min-w-0 cursor-pointer flex-col gap-0.5 rounded-lg border bg-card p-1 text-right transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none sm:min-h-32 sm:gap-1 sm:rounded-xl sm:p-2",
         day.inCurrentMonth ? "border-border" : "border-transparent bg-muted/40",
         isHoliday &&
           day.inCurrentMonth &&

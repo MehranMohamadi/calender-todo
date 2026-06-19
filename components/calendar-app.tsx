@@ -154,6 +154,7 @@ export function CalendarApp() {
           </div>
         ) : view === "month" ? (
           <MonthlyCalendar
+            key={`month-${anchor.jy}-${anchor.jm}`}
             jy={anchor.jy}
             jm={anchor.jm}
             todayIso={today}
@@ -166,6 +167,7 @@ export function CalendarApp() {
           />
         ) : (
           <WeeklyCalendar
+            key={`week-${weekAnchor}`}
             anchorIso={weekAnchor}
             todayIso={today}
             selectedIso={selectedIso}

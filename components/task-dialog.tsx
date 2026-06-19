@@ -108,7 +108,7 @@ export function TaskDialog({
 
   return (
     <Dialog open={state.open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md" dir="rtl">
+      <DialogContent className="sm:max-w-md" dir="rtl" initialFocus={false}>
         <DialogHeader className="text-right">
           <DialogTitle>{isEdit ? "ویرایش کار" : "افزودن کار"}</DialogTitle>
           {dateLabel && (
@@ -132,7 +132,6 @@ export function TaskDialog({
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSave()
               }}
-              autoFocus
             />
             {error && (
               <p className="text-sm text-destructive" role="alert">
