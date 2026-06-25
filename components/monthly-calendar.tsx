@@ -30,19 +30,19 @@ export function MonthlyCalendar({
   const days = getMonthGrid(jy, jm)
 
   return (
-    <div className="flex min-w-0 flex-col gap-1.5 sm:gap-2">
-      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+    <div className="flex min-w-0 flex-col gap-1">
+      <div className="grid grid-cols-7 gap-1">
         {PERSIAN_WEEKDAYS.map((wd) => (
           <div
             key={wd}
-            className="min-w-0 truncate py-1 text-center text-[10px] font-medium text-muted-foreground sm:text-sm"
+            className="min-w-0 truncate py-0.5 text-center text-[10px] font-medium text-muted-foreground sm:text-xs"
           >
             {wd}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+      <div className="grid grid-cols-7 gap-1">
         {days.map((day) => (
           <DayCell
             key={day.iso}

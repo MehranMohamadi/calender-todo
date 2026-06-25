@@ -50,12 +50,12 @@ export function DayCell({
         }
       }}
       className={cn(
-        "group relative flex min-h-16 min-w-0 cursor-pointer flex-col gap-0.5 rounded-lg border bg-card p-1 text-right transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none sm:min-h-32 sm:gap-1 sm:rounded-xl sm:p-2",
-        day.inCurrentMonth ? "border-border" : "border-transparent bg-muted/40",
+        "group relative flex min-h-14 min-w-0 cursor-pointer flex-col gap-0.5 rounded-md border bg-card p-1 text-right transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none sm:min-h-24 sm:p-1.5",
+        day.inCurrentMonth ? "border-border" : "border-transparent bg-muted/35",
         isHoliday &&
           day.inCurrentMonth &&
-          "border-destructive/30 bg-destructive/5",
-        isSelected && "ring-2 ring-primary ring-offset-1 ring-offset-background",
+          "border-destructive/25 bg-destructive/5",
+        isSelected && "ring-1 ring-primary ring-offset-1 ring-offset-background",
       )}
     >
       <div className="flex items-center justify-between">
@@ -66,14 +66,14 @@ export function DayCell({
             onAddTask()
           }}
           aria-label="افزودن کار"
-          className="hidden size-5 items-center justify-center rounded-full text-muted-foreground opacity-0 transition-opacity hover:bg-primary hover:text-primary-foreground group-hover:opacity-100 sm:flex"
+          className="hidden size-5 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity hover:bg-primary hover:text-primary-foreground group-hover:opacity-100 sm:flex"
         >
-          <Plus className="size-3.5" />
+          <Plus className="size-3" />
         </button>
 
         <span
           className={cn(
-            "flex size-6 items-center justify-center rounded-full text-xs font-semibold tabular-nums sm:size-7 sm:text-sm",
+            "flex size-5 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums sm:size-6 sm:text-xs",
             isToday
               ? "bg-primary text-primary-foreground"
               : !day.inCurrentMonth
@@ -89,7 +89,7 @@ export function DayCell({
 
       {holiday && day.inCurrentMonth && (
         <p
-          className="hidden truncate text-[10px] leading-tight text-destructive sm:block"
+          className="hidden truncate text-[9px] leading-tight text-destructive sm:block"
           title={holiday.title}
         >
           {holiday.title}
@@ -124,7 +124,7 @@ export function DayCell({
         </div>
       )}
 
-      <div className="hidden flex-col gap-1 overflow-hidden sm:flex">
+      <div className="hidden flex-col gap-0.5 overflow-hidden sm:flex">
         {visible.map((task) => (
           <TaskItem
             key={task.id}
@@ -135,7 +135,7 @@ export function DayCell({
           />
         ))}
         {remaining > 0 && (
-          <span className="px-1 text-[11px] text-muted-foreground">
+          <span className="px-1 text-[10px] text-muted-foreground">
             {`+${toPersianDigits(remaining)} مورد دیگر`}
           </span>
         )}

@@ -194,11 +194,11 @@ export function CalendarApp() {
 
   return (
     <div
-      className="mx-auto flex w-full max-w-6xl touch-pan-y flex-col gap-4 px-2 py-4 pb-28 sm:gap-5 sm:px-6 sm:py-10 sm:pb-32"
+      className="mx-auto flex w-full max-w-6xl touch-pan-y flex-col gap-3 px-2 py-3 pb-20 sm:gap-4 sm:px-4 sm:py-6 sm:pb-24"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex flex-col gap-4 sm:gap-5">
+      <div className="flex flex-col gap-3 sm:gap-4">
         {page === "calendar" ? (
           <>
             <CalendarHeader
@@ -210,9 +210,9 @@ export function CalendarApp() {
               onToday={handleToday}
             />
 
-            <main className="min-w-0 rounded-xl border bg-card/40 p-1.5 shadow-sm sm:rounded-2xl sm:p-4">
+            <main className="min-w-0 rounded-lg border bg-card/40 p-1.5 shadow-sm sm:p-2.5">
               {!loaded ? (
-                <div className="py-20 text-center text-muted-foreground">
+                <div className="py-14 text-center text-xs text-muted-foreground">
                   در حال بارگذاری...
                 </div>
               ) : view === "month" ? (

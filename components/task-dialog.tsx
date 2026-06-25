@@ -85,7 +85,7 @@ export function TaskDialog({
       setError("")
       setTaskDate(isoToJalali(state.task?.date ?? state.date ?? todayISO()))
     }
-  }, [state.open, state.task])
+  }, [state.open, state.task, state.date])
 
   const maxDay = getJalaliMonthLength(taskDate.jy, taskDate.jm)
   const selectedDate = jalaliToISO(
@@ -105,7 +105,6 @@ export function TaskDialog({
   function addTag(label: string, color: string) {
     const trimmed = label.trim()
     if (!trimmed) return
-    // Avoid duplicate labels.
     if (tags.some((t) => t.label === trimmed)) {
       setTagLabel("")
       return
@@ -135,7 +134,7 @@ export function TaskDialog({
   return (
     <Dialog open={state.open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md"
+        className="max-h-[calc(100dvh-1.25rem)] overflow-y-auto sm:max-w-sm"
         dir="rtl"
         initialFocus={false}
       >
@@ -146,10 +145,10 @@ export function TaskDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 py-2">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3 py-1">
+          <div className="flex flex-col gap-1.5">
             <Label>تاریخ</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-1.5">
               <Select
                 value={String(taskDate.jd)}
                 onValueChange={(value) =>
@@ -220,7 +219,7 @@ export function TaskDialog({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="task-title">عنوان کار</Label>
             <Input
               id="task-title"
@@ -229,30 +228,30 @@ export function TaskDialog({
                 setTitle(e.target.value)
                 if (error) setError("")
               }}
-              placeholder="مثلاً جلسه با تیم"
+              placeholder="مثلا جلسه با تیم"
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSave()
               }}
             />
             {error && (
-              <p className="text-sm text-destructive" role="alert">
+              <p className="text-xs text-destructive" role="alert">
                 {error}
               </p>
             )}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="task-desc">توضیحات (اختیاری)</Label>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="task-desc">توضیحات اختیاری</Label>
             <Textarea
               id="task-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="جزئیات بیشتر..."
-              rows={3}
+              rows={2}
             />
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="task-priority">اولویت</Label>
             <Select
               value={priority}
@@ -271,15 +270,15 @@ export function TaskDialog({
             </Select>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             <Label>برچسب‌ها</Label>
 
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {tags.map((t) => (
                   <span
                     key={t.id}
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+                    className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium"
                     style={{
                       backgroundColor: t.color,
                       color: readableTextColor(t.color),
@@ -299,18 +298,18 @@ export function TaskDialog({
               </div>
             )}
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <input
                 type="color"
                 value={tagColor}
                 onChange={(e) => setTagColor(e.target.value)}
                 aria-label="انتخاب رنگ برچسب"
-                className="size-9 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0.5"
+                className="size-7 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0.5"
               />
               <Input
                 value={tagLabel}
                 onChange={(e) => setTagLabel(e.target.value)}
-                placeholder="نام برچسب جدید"
+                placeholder="نام برچسب"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault()
@@ -326,20 +325,20 @@ export function TaskDialog({
                 aria-label="افزودن برچسب"
                 onClick={() => addTag(tagLabel, tagColor)}
               >
-                <Plus className="size-4" />
+                <Plus className="size-3.5" />
               </Button>
             </div>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1">
               {TAG_PRESETS.map((preset) => (
                 <button
                   key={preset.label}
                   type="button"
                   onClick={() => addTag(preset.label, preset.color)}
-                  className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted"
+                  className="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-muted"
                 >
                   <span
-                    className="size-2.5 rounded-full"
+                    className="size-2 rounded-full"
                     style={{ backgroundColor: preset.color }}
                   />
                   {preset.label}
@@ -349,7 +348,7 @@ export function TaskDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex-row-reverse justify-start gap-2 sm:justify-start">
+        <DialogFooter className="flex-row-reverse justify-start gap-1.5 sm:justify-start">
           <Button onClick={handleSave}>ذخیره</Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             انصراف
@@ -360,7 +359,7 @@ export function TaskDialog({
               className="me-auto text-destructive hover:text-destructive"
               onClick={onDelete}
             >
-              <Trash2 className="size-4" />
+              <Trash2 className="size-3.5" />
               حذف
             </Button>
           )}

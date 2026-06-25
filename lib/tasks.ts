@@ -78,31 +78,81 @@ function createId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
 }
 
+function isPriority(value: unknown): value is Priority {
+  return value === "low" || value === "medium" || value === "high"
+}
+
+function isTag(value: unknown): value is Tag {
+  if (!value || typeof value !== "object") return false
+  const tag = value as Partial<Tag>
+  return (
+    typeof tag.id === "string" &&
+    typeof tag.label === "string" &&
+    typeof tag.color === "string"
+  )
+}
+
+function normalizeTask(value: unknown): Task | null {
+  if (!value || typeof value !== "object") return null
+  const task = value as Partial<Task>
+  if (
+    typeof task.id !== "string" ||
+    typeof task.title !== "string" ||
+    typeof task.date !== "string"
+  ) {
+    return null
+  }
+
+  return {
+    id: task.id,
+    title: task.title,
+    description:
+      typeof task.description === "string" ? task.description : undefined,
+    date: task.date,
+    completed: Boolean(task.completed),
+    priority: isPriority(task.priority) ? task.priority : "medium",
+    tags: Array.isArray(task.tags) ? task.tags.filter(isTag) : [],
+  }
+}
+
+function readStoredTasks(): Task[] {
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (!raw) return []
+
+  const parsed = JSON.parse(raw)
+  if (!Array.isArray(parsed)) return []
+
+  return parsed.map(normalizeTask).filter((task): task is Task => Boolean(task))
+}
+
+function safeWrite(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // Keep the in-memory state usable if storage is unavailable or full.
+  }
+}
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw) as Task[]
+      const stored = readStoredTasks()
+      if (stored.length > 0 || localStorage.getItem(STORAGE_KEY)) {
         const shouldCleanSamples = !localStorage.getItem(SAMPLE_CLEANUP_KEY)
         const cleaned = shouldCleanSamples
-          ? parsed.filter((task) => !LEGACY_SAMPLE_TITLES.has(task.title))
-          : parsed
-        const normalized = cleaned.map((task) => ({
-          ...task,
-          tags: Array.isArray(task.tags) ? task.tags : [],
-        }))
-        setTasks(normalized)
+          ? stored.filter((task) => !LEGACY_SAMPLE_TITLES.has(task.title))
+          : stored
+        setTasks(cleaned)
         if (shouldCleanSamples) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized))
-          localStorage.setItem(SAMPLE_CLEANUP_KEY, "1")
+          safeWrite(STORAGE_KEY, JSON.stringify(cleaned))
+          safeWrite(SAMPLE_CLEANUP_KEY, "1")
         }
       } else {
         setTasks([])
-        localStorage.setItem(SAMPLE_CLEANUP_KEY, "1")
+        safeWrite(SAMPLE_CLEANUP_KEY, "1")
       }
     } catch {
       setTasks([])
@@ -112,7 +162,7 @@ export function useTasks() {
 
   useEffect(() => {
     if (loaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+      safeWrite(STORAGE_KEY, JSON.stringify(tasks))
     }
   }, [tasks, loaded])
 

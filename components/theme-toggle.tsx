@@ -39,7 +39,7 @@ export function ThemeToggle() {
       aria-label={dark ? "فعال‌کردن تم روشن" : "فعال‌کردن تم تاریک"}
       title={dark ? "تم روشن" : "تم تاریک"}
     >
-      {mounted && dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      {mounted && dark ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
     </Button>
   )
 }

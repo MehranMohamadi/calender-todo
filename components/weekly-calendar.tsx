@@ -38,7 +38,7 @@ export function WeeklyCalendar({
   const days = getWeekDays(anchorIso)
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
       {days.map((day, index) => {
         const tasks = tasksByDate.get(day.iso) ?? []
         const isToday = day.iso === todayIso
@@ -61,19 +61,17 @@ export function WeeklyCalendar({
               }
             }}
             className={cn(
-              "group flex min-w-0 cursor-pointer flex-col gap-2 rounded-xl border bg-card p-2 text-right transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none sm:p-3",
+              "group flex min-w-0 cursor-pointer flex-col gap-1.5 rounded-md border bg-card p-1.5 text-right transition-shadow duration-150 hover:shadow-sm motion-reduce:transition-none sm:p-2",
               isToday && "border-primary/40 bg-primary/5",
               isHoliday && !isToday && "border-destructive/30 bg-destructive/5",
-              isSelected &&
-                "border-2 border-primary ring-1 ring-primary/30",
+              isSelected && "border-primary ring-1 ring-primary/30",
             )}
           >
-            {/* Day label column */}
-            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border pb-2">
-              <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center justify-between gap-1.5 border-b border-border pb-1.5">
+              <div className="flex items-center gap-1.5">
                 <span
                   className={cn(
-                    "flex size-8 items-center justify-center rounded-full text-sm font-bold tabular-nums",
+                    "flex size-6 items-center justify-center rounded-full text-xs font-semibold tabular-nums",
                     isToday
                       ? "bg-primary text-primary-foreground"
                       : isHoliday
@@ -83,37 +81,39 @@ export function WeeklyCalendar({
                 >
                   {toPersianDigits(day.jd)}
                 </span>
-                <div className="flex flex-col">
+                <div className="flex min-w-0 flex-col">
                   <span
                     className={cn(
-                      "text-sm font-semibold",
+                      "truncate text-xs font-semibold",
                       isHoliday ? "text-destructive" : "text-foreground",
                     )}
                   >
                     {PERSIAN_WEEKDAYS[index]}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="truncate text-[10px] text-muted-foreground">
                     {PERSIAN_MONTHS[day.jm - 1]} {toPersianDigits(day.jy)}
                   </span>
                 </div>
               </div>
 
               <div className="flex min-w-0 flex-col items-end gap-0.5">
-                <span className="hidden text-[10px] text-muted-foreground/70 tabular-nums sm:block">
+                <span className="hidden text-[9px] text-muted-foreground/70 tabular-nums sm:block">
                   {`${gy}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`}
                 </span>
                 {holiday && (
-                  <span className="max-w-24 truncate text-[10px] font-medium text-destructive" title={holiday.title}>
+                  <span
+                    className="max-w-20 truncate text-[9px] font-medium text-destructive"
+                    title={holiday.title}
+                  >
                     {holiday.title}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Tasks area */}
-            <div className="flex max-h-28 min-h-10 min-w-0 flex-1 flex-col gap-1.5 overflow-y-auto">
+            <div className="flex max-h-24 min-h-8 min-w-0 flex-1 flex-col gap-1 overflow-y-auto">
               {tasks.length === 0 ? (
-                <p className="flex items-center py-2 text-xs text-muted-foreground/70">
+                <p className="flex items-center py-1.5 text-[11px] text-muted-foreground/70">
                   کاری ثبت نشده
                 </p>
               ) : (
@@ -133,16 +133,15 @@ export function WeeklyCalendar({
               )}
             </div>
 
-            {/* Add button */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation()
                 onAddTask(day.iso)
               }}
-              className="flex w-full shrink-0 items-center justify-center gap-1 rounded-md border border-dashed border-border px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              className="flex w-full shrink-0 items-center justify-center gap-1 rounded-sm border border-dashed border-border px-2 py-1 text-[10px] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
             >
-              <Plus className="size-3.5" />
+              <Plus className="size-3" />
               افزودن کار
             </button>
           </div>

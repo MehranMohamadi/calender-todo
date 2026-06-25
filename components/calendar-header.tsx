@@ -23,13 +23,13 @@ export function CalendarHeader({
   onToday,
 }: CalendarHeaderProps) {
   return (
-    <header className="persian-header relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-primary/10 bg-card/85 p-3 shadow-sm backdrop-blur-sm sm:px-4">
-      <div className="relative z-10 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm shadow-primary/20">
-            <CalendarDays className="size-4" />
+    <header className="persian-header relative flex flex-col gap-2 overflow-hidden rounded-lg border border-primary/10 bg-card/80 p-2.5 shadow-sm backdrop-blur-sm sm:px-3">
+      <div className="relative z-10 flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm shadow-primary/15">
+            <CalendarDays className="size-3.5" />
           </span>
-          <h1 className="truncate text-sm font-bold text-foreground sm:text-base">
+          <h1 className="truncate text-xs font-semibold text-foreground sm:text-sm">
             تقویم کارهای من
           </h1>
         </div>
@@ -39,20 +39,19 @@ export function CalendarHeader({
         </div>
       </div>
 
-      <div className="relative z-10 flex items-center justify-between gap-3 border-t border-primary/10 pt-3">
-        <h2 className="truncate text-base font-bold text-foreground sm:text-lg">
+      <div className="relative z-10 flex items-center justify-between gap-2 border-t border-primary/10 pt-2">
+        <h2 className="truncate text-sm font-semibold text-foreground sm:text-base">
           {title}
         </h2>
 
         <div className="flex shrink-0 items-center gap-1">
-          {/* In RTL, "next" sits on the left, "prev" on the right */}
           <Button
             variant="outline"
             size="icon-sm"
             onClick={onPrev}
             aria-label="قبلی"
           >
-            <ChevronRight className="size-4" />
+            <ChevronRight className="size-3.5" />
           </Button>
           <Button
             variant="outline"
@@ -60,13 +59,12 @@ export function CalendarHeader({
             onClick={onNext}
             aria-label="بعدی"
           >
-            <ChevronLeft className="size-4" />
+            <ChevronLeft className="size-3.5" />
           </Button>
           <Button variant="secondary" size="sm" onClick={onToday} className="ms-1">
             امروز
           </Button>
         </div>
-
       </div>
     </header>
   )

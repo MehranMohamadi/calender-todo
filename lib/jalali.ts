@@ -143,7 +143,7 @@ export function getMonthGrid(jy: number, jm: number): CalendarDay[] {
     })
   }
 
-  // Trailing days to fill complete weeks (6 rows x 7 = 42 for stability)
+  // Trailing days to fill complete weeks.
   while (days.length % 7 !== 0) {
     const last = days[days.length - 1]
     const next = addDaysToJalali(last.jy, last.jm, last.jd, 1)
@@ -201,16 +201,16 @@ export function formatMonthYear(jy: number, jm: number): string {
   return `${PERSIAN_MONTHS[jm - 1]} ${toPersianDigits(jy)}`
 }
 
-/** A label for the current week range, e.g. "۵ – ۱۱ فروردین". */
+/** A label for the current week range, e.g. "۵ - ۱۱ فروردین". */
 export function formatWeekRange(days: CalendarDay[]): string {
   const first = days[0]
   const last = days[days.length - 1]
   if (first.jm === last.jm) {
-    return `${toPersianDigits(first.jd)} – ${toPersianDigits(last.jd)} ${
+    return `${toPersianDigits(first.jd)} - ${toPersianDigits(last.jd)} ${
       PERSIAN_MONTHS[first.jm - 1]
     } ${toPersianDigits(first.jy)}`
   }
-  return `${toPersianDigits(first.jd)} ${PERSIAN_MONTHS[first.jm - 1]} – ${toPersianDigits(
+  return `${toPersianDigits(first.jd)} ${PERSIAN_MONTHS[first.jm - 1]} - ${toPersianDigits(
     last.jd,
   )} ${PERSIAN_MONTHS[last.jm - 1]}`
 }

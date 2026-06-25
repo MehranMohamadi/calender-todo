@@ -79,7 +79,7 @@
   --chart-3: oklch(0.62 0.13 155);
   --chart-4: oklch(0.72 0.14 75);
   --chart-5: oklch(0.58 0.2 25);
-  --radius: 0.875rem;
+  --radius: 0.625rem;
   --sidebar: oklch(0.985 0.005 85);
   --sidebar-foreground: oklch(0.27 0.03 250);
   --sidebar-primary: oklch(0.52 0.12 248);
@@ -177,10 +177,9 @@
 
 .persian-app {
   background-image:
-    linear-gradient(oklch(0.49 0.105 190 / 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(0.49 0.105 190 / 0.025) 1px, transparent 1px),
-    radial-gradient(circle at 50% 0%, oklch(0.67 0.105 185 / 0.11), transparent 34rem);
-  background-size: 32px 32px, 32px 32px, 100% 100%;
+    linear-gradient(oklch(0.49 0.105 190 / 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.49 0.105 190 / 0.018) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px;
 }
 
 .persian-header::before {
@@ -193,16 +192,7 @@
 }
 
 .persian-header::after {
-  content: '';
-  position: absolute;
-  width: 7rem;
-  height: 7rem;
-  inset-inline-end: -3.5rem;
-  top: -3.5rem;
-  transform: rotate(45deg);
-  border: 1px solid oklch(0.49 0.105 190 / 0.1);
-  box-shadow: 0 0 0 12px oklch(0.49 0.105 190 / 0.025), 0 0 0 24px oklch(0.49 0.105 190 / 0.02);
-  pointer-events: none;
+  display: none;
 }
 
 /* The v0 preview environment injects this badge outside the app tree. */

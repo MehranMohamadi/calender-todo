@@ -24,18 +24,17 @@ interface TaskItemProps {
 
 export function TaskItem({ task, onToggle, onEdit, compact }: TaskItemProps) {
   const styles = PRIORITY_STYLES[task.priority]
-
   const tags = task.tags ?? []
 
   return (
     <div
       className={cn(
-        "group flex flex-col gap-1 rounded-md border-s-2 bg-secondary/60 transition-colors hover:bg-secondary",
+        "group flex flex-col gap-0.5 rounded-sm border-s-2 bg-secondary/60 transition-colors hover:bg-secondary",
         styles.bar,
-        compact ? "px-1.5 py-1" : "px-2 py-1.5",
+        compact ? "px-1 py-0.5" : "px-1.5 py-1",
       )}
     >
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
         <button
           type="button"
           onClick={(e) => {
@@ -43,17 +42,19 @@ export function TaskItem({ task, onToggle, onEdit, compact }: TaskItemProps) {
             onToggle()
           }}
           aria-label={
-            task.completed ? "علامت‌گذاری به‌عنوان انجام‌نشده" : "انجام شد"
+            task.completed
+              ? "علامت‌گذاری به‌عنوان انجام‌نشده"
+              : "انجام شد"
           }
           className={cn(
             "flex shrink-0 items-center justify-center rounded-full border transition-colors",
-            compact ? "size-3.5" : "size-4",
+            compact ? "size-3" : "size-3.5",
             task.completed
               ? "border-success bg-success text-white"
               : "border-muted-foreground/40 text-transparent hover:border-primary",
           )}
         >
-          <Check className={compact ? "size-2.5" : "size-3"} strokeWidth={3} />
+          <Check className={compact ? "size-2" : "size-2.5"} strokeWidth={3} />
         </button>
 
         <button
@@ -64,7 +65,7 @@ export function TaskItem({ task, onToggle, onEdit, compact }: TaskItemProps) {
           }}
           className={cn(
             "min-w-0 flex-1 truncate text-start",
-            compact ? "text-[11px]" : "text-sm",
+            compact ? "text-[10px]" : "text-xs",
             task.completed
               ? "text-muted-foreground line-through opacity-60"
               : "text-foreground",
@@ -82,8 +83,8 @@ export function TaskItem({ task, onToggle, onEdit, compact }: TaskItemProps) {
       {tags.length > 0 && (
         <div
           className={cn(
-            "flex flex-wrap gap-1",
-            compact ? "ps-5" : "ps-5.5",
+            "flex flex-wrap gap-0.5",
+            compact ? "ps-4" : "ps-4.5",
             task.completed && "opacity-60",
           )}
         >
@@ -91,8 +92,8 @@ export function TaskItem({ task, onToggle, onEdit, compact }: TaskItemProps) {
             <span
               key={tag.id}
               className={cn(
-                "inline-flex items-center rounded-full font-medium leading-none",
-                compact ? "px-1 py-0.5 text-[9px]" : "px-1.5 py-0.5 text-[10px]",
+                "inline-flex items-center rounded-sm font-medium leading-none",
+                compact ? "px-1 py-0.5 text-[8px]" : "px-1 py-0.5 text-[9px]",
               )}
               style={{
                 backgroundColor: tag.color,

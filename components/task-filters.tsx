@@ -16,7 +16,7 @@ interface TaskFiltersProps {
 const FILTERS: { value: TaskFilter; label: string }[] = [
   { value: "all", label: "همه" },
   { value: "done", label: "انجام‌شده" },
-  { value: "todo", label: "انجام‌نشده" },
+  { value: "todo", label: "مانده" },
 ]
 
 export function TaskFilters({
@@ -26,26 +26,26 @@ export function TaskFilters({
   onFilterChange,
 }: TaskFiltersProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <div className="relative w-full sm:max-w-xs">
-        <Search className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="جستجو در کارها..."
           aria-label="جستجو در کارها"
-          className="bg-card/70 pr-8"
+          className="bg-card/70 pr-7"
         />
       </div>
 
-      <div className="inline-flex rounded-lg border border-primary/10 bg-card/70 p-0.5 shadow-xs backdrop-blur-sm">
+      <div className="inline-flex rounded-md border border-primary/10 bg-card/70 p-0.5 shadow-xs backdrop-blur-sm">
         {FILTERS.map((f) => (
           <button
             key={f.value}
             type="button"
             onClick={() => onFilterChange(f.value)}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200",
+              "rounded-sm px-2.5 py-1 text-xs font-medium transition-all duration-200",
               filter === f.value
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground",
